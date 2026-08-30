@@ -31,10 +31,65 @@ FEATURES = [
     "gender", "stress_level", "academic_work_impact",
 ]
 
+# ---------------------------------------------------------------------------
+# Dropdown category buckets. Each (label, value) pair: the label is shown to
+# the user, and `value` (the bucket's midpoint) is what actually gets fed to
+# the model. Ranges are based on the real distribution of the training data.
+# ---------------------------------------------------------------------------
+AGE_BUCKETS = [
+    ("13 to 17", 15), ("18 to 21", 19.5), ("22 to 25", 23.5),
+    ("26 to 29", 27.5), ("30 to 33", 31.5), ("34 to 40", 37),
+    ("41 to 55", 48), ("56 to 90", 70),
+]
+SCREEN_TIME_BUCKETS = [
+    ("0 to 2 hrs", 1), ("2 to 4 hrs", 3), ("4 to 6 hrs", 5),
+    ("6 to 8 hrs", 7), ("8 to 10 hrs", 9), ("10 to 12 hrs", 11),
+    ("12+ hrs", 14),
+]
+SOCIAL_MEDIA_BUCKETS = [
+    ("0 to 1 hr", 0.5), ("1 to 2 hrs", 1.5), ("2 to 3 hrs", 2.5),
+    ("3 to 4 hrs", 3.5), ("4 to 6 hrs", 5), ("6+ hrs", 7),
+]
+GAMING_BUCKETS = [
+    ("0 to 0.5 hr", 0.25), ("0.5 to 1 hr", 0.75), ("1 to 1.5 hrs", 1.25),
+    ("1.5 to 2 hrs", 1.75), ("2 to 3 hrs", 2.5), ("3+ hrs", 3.5),
+]
+WORK_STUDY_BUCKETS = [
+    ("0 to 1 hr", 0.5), ("1 to 2 hrs", 1.5), ("2 to 3 hrs", 2.5),
+    ("3 to 4 hrs", 3.5), ("4 to 5 hrs", 4.5), ("5+ hrs", 5.5),
+]
+SLEEP_BUCKETS = [
+    ("Less than 4 hrs", 3.5), ("4 to 5 hrs", 4.5), ("5 to 6 hrs", 5.5),
+    ("6 to 7 hrs", 6.5), ("7 to 8 hrs", 7.5), ("8 to 10 hrs", 9),
+]
+NOTIFICATIONS_BUCKETS = [
+    ("0 to 25", 12), ("25 to 50", 37), ("50 to 100", 75),
+    ("100 to 150", 125), ("150 to 200", 175), ("200+", 225),
+]
+APP_OPENS_BUCKETS = [
+    ("0 to 20", 10), ("20 to 40", 30), ("40 to 60", 50),
+    ("60 to 90", 75), ("90 to 120", 105), ("120+", 150),
+]
+WEEKEND_SCREEN_BUCKETS = [
+    ("0 to 4 hrs", 2), ("4 to 6 hrs", 5), ("6 to 8 hrs", 7),
+    ("8 to 10 hrs", 9), ("10 to 12 hrs", 11), ("12 to 15 hrs", 13.5),
+    ("15+ hrs", 17),
+]
+
+
+def bucket_select(label, buckets, default_index=0):
+    """Show a dropdown of range labels, return the numeric value behind the chosen one."""
+    choice = st.selectbox(label, options=[b[0] for b in buckets], index=default_index)
+    value = dict(buckets)[choice]
+    return value
+
+
+model_path = "model.pkl"
+
 
 @st.cache_resource
 def load_model():
-    with open("model.pkl", "rb") as f:
+    with open(model_path, "rb") as f:
         return pickle.load(f)
 
 
@@ -45,16 +100,16 @@ st.title("📱 Screen-Time Addiction Risk Predictor")
 with st.form("input_form"):
     col1, col2 = st.columns(2)
     with col1:
-        age = st.number_input("Age", 13, 90, 25)
-        daily_screen_time_hours = st.number_input("Daily screen time (hrs)", 0.0, 24.0, 6.0, step=0.15)
-        social_media_hours = st.number_input("Social media (hrs/day)", 0.0, 24.0, 2.0, step=0.15)
-        gaming_hours = st.number_input("Gaming (hrs/day)", 0.0, 24.0, 1.0, step=0.15)
-        work_study_hours = st.number_input("Work/study screen time (hrs/day)", 0.0, 24.0, 3.0, step=0.15)
+        age = bucket_select("Age", AGE_BUCKETS, default_index=2)
+        daily_screen_time_hours = bucket_select("Daily screen time", SCREEN_TIME_BUCKETS, default_index=3)
+        social_media_hours = bucket_select("Social media use", SOCIAL_MEDIA_BUCKETS, default_index=1)
+        gaming_hours = bucket_select("Gaming", GAMING_BUCKETS, default_index=1)
+        work_study_hours = bucket_select("Work/study screen time", WORK_STUDY_BUCKETS, default_index=2)
     with col2:
-        sleep_hours = st.number_input("Sleep (hrs/night)", 0.0, 24.0, 7.5, step=0.15)
-        notifications_per_day = st.number_input("Notifications/day", 0, 1000, 100)
-        app_opens_per_day = st.number_input("App opens/day", 0, 500, 50)
-        weekend_screen_time = st.number_input("Weekend screen time (hrs)", 0.0, 24.0, 8.0, step=0.15)
+        sleep_hours = bucket_select("Sleep", SLEEP_BUCKETS, default_index=4)
+        notifications_per_day = bucket_select("Notifications per day", NOTIFICATIONS_BUCKETS, default_index=2)
+        app_opens_per_day = bucket_select("App opens per day", APP_OPENS_BUCKETS, default_index=2)
+        weekend_screen_time = bucket_select("Weekend screen time", WEEKEND_SCREEN_BUCKETS, default_index=2)
 
     gender = st.selectbox("Gender", GENDER_OPTIONS)
     stress_level = st.selectbox("Stress level", STRESS_OPTIONS)
@@ -99,4 +154,4 @@ if submitted:
         st.success(f"✅ Lower addiction risk — confidence: **{confidence:.1%}**")
     st.progress(min(max(proba, 0.0), 1.0))
 
-    
+    st.metric("Confidence score", f"{confidence:.1%}")
