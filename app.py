@@ -46,12 +46,12 @@ with st.form("input_form"):
     col1, col2 = st.columns(2)
     with col1:
         age = st.number_input("Age", 13, 90, 25)
-        daily_screen_time_hours = st.number_input("Daily screen time (hrs)", 0.0, 24.0, 6.0, step=0.25)
-        social_media_hours = st.number_input("Social media (hrs/day)", 0.0, 24.0, 2.0, step=0.25)
-        gaming_hours = st.number_input("Gaming (hrs/day)", 0.0, 24.0, 1.0, step=0.25)
-        work_study_hours = st.number_input("Work/study screen time (hrs/day)", 0.0, 24.0, 3.0, step=0.25)
+        daily_screen_time_hours = st.number_input("Daily screen time (hrs)", 0.0, 24.0, 6.0, step=0.15)
+        social_media_hours = st.number_input("Social media (hrs/day)", 0.0, 24.0, 2.0, step=0.15)
+        gaming_hours = st.number_input("Gaming (hrs/day)", 0.0, 24.0, 1.0, step=0.15)
+        work_study_hours = st.number_input("Work/study screen time (hrs/day)", 0.0, 24.0, 3.0, step=0.15)
     with col2:
-        sleep_hours = st.number_input("Sleep (hrs/night)", 0.0, 24.0, 7.5, step=0.25)
+        sleep_hours = st.number_input("Sleep (hrs/night)", 0.0, 24.0, 7.5, step=0.15)
         notifications_per_day = st.number_input("Notifications/day", 0, 1000, 100)
         app_opens_per_day = st.number_input("App opens/day", 0, 500, 50)
         weekend_screen_time = st.number_input("Weekend screen time (hrs)", 0.0, 24.0, 8.0, step=0.25)
