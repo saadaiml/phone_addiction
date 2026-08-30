@@ -94,10 +94,10 @@ if submitted:
 
     st.divider()
     if proba >= 0.5:
-        st.error(f"⚠️ Higher addiction risk —("Confidence score", f"{confidence:.1%}") **")
+        st.error(f"⚠️ Higher addiction risk — probability: **{proba:.1%}**")
     else:
         st.success(f"✅ Lower addiction risk — probability: **{proba:.1%}**")
     st.progress(min(max(proba, 0.0), 1.0))
 
     st.metric("Confidence score", f"{confidence:.1%}")
-    
+    st.caption("Confidence reflects how sure the model is in this prediction — not the risk level itself.")
