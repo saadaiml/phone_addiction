@@ -154,4 +154,4 @@ if submitted:
         st.success(f"✅ Lower addiction risk — confidence: **{confidence:.1%}**")
     st.progress(min(max(proba, 0.0), 1.0))
 
-    st.metric("Confidence score", f"{confidence:.1%}")
+
